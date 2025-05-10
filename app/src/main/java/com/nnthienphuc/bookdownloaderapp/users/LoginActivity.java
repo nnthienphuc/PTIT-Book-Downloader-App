@@ -18,8 +18,12 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.nnthienphuc.bookdownloaderapp.MainActivity;
 import com.nnthienphuc.bookdownloaderapp.R;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -28,25 +32,18 @@ public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mAuth = FirebaseAuth.getInstance();
-
-        // Đã login -> skip LoginActivity
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-            return;
-        }
-
         setContentView(R.layout.activity_login);
 
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // lấy từ google-services.json
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -82,12 +79,28 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(this, "Login success: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(this, MainActivity.class));
-                        finish();
+                        if (user != null) saveUserToFirestore(user);
                     } else {
                         Toast.makeText(this, "Login failed.", Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    private void saveUserToFirestore(FirebaseUser user) {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("uid", user.getUid());
+        userMap.put("name", user.getDisplayName());
+        userMap.put("email", user.getEmail());
+
+        db.collection("users").document(user.getUid()).set(userMap)
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Login success: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, MainActivity.class));
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to save user info", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Firestore error", e);
                 });
     }
 }
