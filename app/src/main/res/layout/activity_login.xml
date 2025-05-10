@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loginRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <Button
+        android:id="@+id/googleSignInBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đăng nhập với Google"
+        android:textAllCaps="false"
+        android:drawableStart="@android:drawable/ic_dialog_email"
+        android:drawablePadding="8dp"
+        android:padding="12dp"
+        android:backgroundTint="@color/purple_500"
+        android:textColor="#FFFFFF" />
+</LinearLayout>

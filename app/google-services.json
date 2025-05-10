@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "319744513979",
+    "project_id": "bookdownloaderapp",
+    "storage_bucket": "bookdownloaderapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:319744513979:android:bee771add2e4bca74ad69e",
+        "android_client_info": {
+          "package_name": "com.nnthienphuc.bookdownloaderapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxxUqldtUqGyfSzXzUA3i3Zr5zeqj8IBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
