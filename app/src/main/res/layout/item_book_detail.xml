@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/detailBookThumbnail"
+            android:layout_width="150dp"
+            android:layout_height="220dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_books" />
+
+        <TextView android:id="@+id/detailBookTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tên sách"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:paddingTop="8dp" />
+
+        <TextView android:id="@+id/detailBookAuthor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tác giả" />
+
+        <TextView android:id="@+id/detailBookGenre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thể loại" />
+
+        <TextView android:id="@+id/detailBookPageCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Số trang" />
+
+        <TextView android:id="@+id/detailBookSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dung lượng" />
+
+        <TextView android:id="@+id/detailBookUploader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Người upload" />
+
+        <TextView android:id="@+id/detailBookDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mô tả"
+            android:paddingTop="4dp" />
+
+        <Button
+            android:id="@+id/detailBookDownloadBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tải sách" />
+    </LinearLayout>
+</ScrollView>
