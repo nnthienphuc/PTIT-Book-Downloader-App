@@ -10,14 +10,14 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/detailBookThumbnail"
+            android:id="@+id/uploadedBookThumbnail"
             android:layout_width="150dp"
             android:layout_height="220dp"
             android:layout_gravity="center"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_books" />
 
-        <TextView android:id="@+id/detailBookTitle"
+        <TextView android:id="@+id/uploadedBookTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tên sách"
@@ -25,41 +25,41 @@
             android:textSize="20sp"
             android:paddingTop="8dp" />
 
-        <TextView android:id="@+id/detailBookAuthor"
+        <TextView android:id="@+id/uploadedBookAuthor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tác giả" />
 
-        <TextView android:id="@+id/detailBookGenre"
+        <TextView android:id="@+id/uploadedBookGenre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Thể loại" />
 
-        <TextView android:id="@+id/detailBookPageCount"
+        <TextView android:id="@+id/uploadedBookPageCount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Số trang" />
 
-        <TextView android:id="@+id/detailBookSize"
+        <TextView android:id="@+id/uploadedBookSize"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Dung lượng" />
 
-        <TextView android:id="@+id/detailBookUploader"
+        <TextView android:id="@+id/uploadedBookUploader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Người upload" />
 
-        <TextView android:id="@+id/detailBookDescription"
+        <TextView android:id="@+id/uploadedBookDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Mô tả"
             android:paddingTop="4dp" />
 
         <Button
-            android:id="@+id/detailBookDownloadBtn"
+            android:id="@+id/uploadedBookDeleteBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Download" />
+            android:text="Xóa sách khỏi danh sách công khai" />
     </LinearLayout>
 </ScrollView>

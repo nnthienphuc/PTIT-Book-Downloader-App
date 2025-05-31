@@ -10,14 +10,15 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/detailBookThumbnail"
+            android:id="@+id/downloadedBookThumbnail"
             android:layout_width="150dp"
             android:layout_height="220dp"
             android:layout_gravity="center"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_books" />
 
-        <TextView android:id="@+id/detailBookTitle"
+        <TextView
+            android:id="@+id/downloadedBookTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tên sách"
@@ -25,41 +26,47 @@
             android:textSize="20sp"
             android:paddingTop="8dp" />
 
-        <TextView android:id="@+id/detailBookAuthor"
+        <TextView
+            android:id="@+id/downloadedBookAuthor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tác giả" />
 
-        <TextView android:id="@+id/detailBookGenre"
+        <TextView
+            android:id="@+id/downloadedBookGenre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Thể loại" />
 
-        <TextView android:id="@+id/detailBookPageCount"
+        <TextView
+            android:id="@+id/downloadedBookPageCount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Số trang" />
 
-        <TextView android:id="@+id/detailBookSize"
+        <TextView
+            android:id="@+id/downloadedBookSize"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Dung lượng" />
 
-        <TextView android:id="@+id/detailBookUploader"
+        <TextView
+            android:id="@+id/downloadedBookUploader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Người upload" />
 
-        <TextView android:id="@+id/detailBookDescription"
+        <TextView
+            android:id="@+id/downloadedBookDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Mô tả"
             android:paddingTop="4dp" />
 
         <Button
-            android:id="@+id/detailBookDownloadBtn"
+            android:id="@+id/openOfflinePdfBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Download" />
+            android:text="Mở để đọc offline" />
     </LinearLayout>
 </ScrollView>

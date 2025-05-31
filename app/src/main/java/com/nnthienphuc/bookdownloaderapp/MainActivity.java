@@ -1,56 +1,60 @@
 package com.nnthienphuc.bookdownloaderapp;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.nnthienphuc.bookdownloaderapp.users.LoginActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.nnthienphuc.bookdownloaderapp.adapters.MainPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FirebaseAnalytics mFirebaseAnalytics;
-    private FirebaseAuth mAuth;
-    private TextView userInfoTextView;
+    private ViewPager2 viewPager;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        viewPager = findViewById(R.id.viewPager);
+        bottomNav = findViewById(R.id.bottomNav);
 
-        if (currentUser == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
+        viewPager.setAdapter(new MainPagerAdapter(this));
+        viewPager.setCurrentItem(0, false); // Default tab
 
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
-        userInfoTextView = findViewById(R.id.userInfo);
-        userInfoTextView.setText("Xin chào: " + currentUser.getDisplayName() + "\nEmail: " + currentUser.getEmail());
-
-        Button btn = findViewById(R.id.sendEventBtn);
-        btn.setOnClickListener(v -> {
-            Bundle clickBundle = new Bundle();
-            clickBundle.putString(FirebaseAnalytics.Param.METHOD, "manual_button_click");
-            mFirebaseAnalytics.logEvent("test_event", clickBundle);
-            Toast.makeText(this, "Sự kiện đã được gửi", Toast.LENGTH_SHORT).show();
+        bottomNav.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.nav_all_books:
+                    viewPager.setCurrentItem(0);
+                    return true;
+                case R.id.nav_downloaded:
+                    viewPager.setCurrentItem(1);
+                    return true;
+                case R.id.nav_profile:
+                    viewPager.setCurrentItem(2);
+                    return true;
+            }
+            return false;
         });
 
-        Button logoutBtn = findViewById(R.id.logoutBtn);
-        logoutBtn.setOnClickListener(v -> {
-            mAuth.signOut();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        bottomNav.setSelectedItemId(R.id.nav_all_books);
+                        break;
+                    case 1:
+                        bottomNav.setSelectedItemId(R.id.nav_downloaded);
+                        break;
+                    case 2:
+                        bottomNav.setSelectedItemId(R.id.nav_profile);
+                        break;
+                }
+            }
         });
     }
 }

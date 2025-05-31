@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- res/layout/fragment_profile.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/userAvatar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_profile" />
 
     <TextView
         android:id="@+id/userInfo"
@@ -14,6 +22,7 @@
         android:text="Thông tin người dùng"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:gravity="center"
         android:layout_marginBottom="12dp" />
 
     <Button
@@ -21,6 +30,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Tải sách lên"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/logoutBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng xuất"
         android:layout_marginBottom="12dp" />
 
     <TextView
@@ -36,6 +52,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:scrollbars="vertical"
-        tools:listitem="@layout/item_book_compact" />
+        tools:listitem="@layout/item_book_compact"
+        android:scrollbars="vertical" />
 </LinearLayout>
