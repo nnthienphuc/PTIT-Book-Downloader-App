@@ -45,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
+                .setAccountName(null) // Luôn hiển thị hộp chọn tài khoản
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -54,8 +55,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        });
     }
 
     @Override
@@ -68,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
                 Log.w(TAG, "Google sign in failed", e);
-                Toast.makeText(this, "Login failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Đăng nhập thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -81,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) saveUserToFirestore(user);
                     } else {
-                        Toast.makeText(this, "Login failed.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Đăng nhập thất bại.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -94,12 +97,12 @@ public class LoginActivity extends AppCompatActivity {
 
         db.collection("users").document(user.getUid()).set(userMap)
                 .addOnSuccessListener(unused -> {
-                    Toast.makeText(this, "Login success: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Đăng nhập thành công: " + user.getEmail(), Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(this, MainActivity.class));
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to save user info", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Không thể lưu thông tin người dùng", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Firestore error", e);
                 });
     }

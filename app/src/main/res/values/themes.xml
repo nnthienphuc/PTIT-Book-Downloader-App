@@ -6,4 +6,5 @@
     </style>
 
     <style name="Theme.BookDownloaderApp" parent="Base.Theme.BookDownloaderApp" />
+
 </resources>

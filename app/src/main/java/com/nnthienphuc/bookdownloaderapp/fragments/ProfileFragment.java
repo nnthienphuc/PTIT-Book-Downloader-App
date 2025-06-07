@@ -1,7 +1,9 @@
 package com.nnthienphuc.bookdownloaderapp.fragments;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,6 +73,30 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
         adapter = new BookAdapter(getContext(), uploadedBooks, "delete");
         uploadedBooksRecyclerView.setAdapter(adapter);
         loadUploadedBooks();
+
+        Button themeBtn = view.findViewById(R.id.changeThemeBtn);
+        themeBtn.setOnClickListener(v -> {
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Chọn giao diện")
+                    .setItems(new String[]{"Hệ thống", "Sáng", "Tối"}, (dialog, which) -> {
+                        int mode;
+                        switch (which) {
+                            case 1: mode = AppCompatDelegate.MODE_NIGHT_NO; break;
+                            case 2: mode = AppCompatDelegate.MODE_NIGHT_YES; break;
+                            default: mode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                        }
+
+                        // Lưu lại theme vào SharedPreferences
+                        SharedPreferences.Editor editor = requireActivity()
+                                .getSharedPreferences("settings", Context.MODE_PRIVATE)
+                                .edit();
+                        editor.putInt("theme_mode", mode).apply();
+
+                        AppCompatDelegate.setDefaultNightMode(mode);
+                    })
+                    .show();
+        });
+
 
         return view;
     }
