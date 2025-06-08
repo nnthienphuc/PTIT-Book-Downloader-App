@@ -2,6 +2,7 @@ package com.nnthienphuc.bookdownloaderapp.models;
 
 import java.io.Serializable;
 
+
 public class Book implements Serializable {
     private String id;
     private String title;
@@ -140,4 +141,14 @@ public class Book implements Serializable {
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
+
+    // Book.java (bổ sung cuối class)
+    public String toJson() {
+        return new com.google.gson.Gson().toJson(this);
+    }
+
+    public static Book fromJson(String json) {
+        return new com.google.gson.Gson().fromJson(json, Book.class);
+    }
+
 }

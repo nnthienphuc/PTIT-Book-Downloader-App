@@ -35,15 +35,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <Button android:id="@+id/pickPdfBtn"
-            android:text="Chọn file PDF"
+        <EditText
+            android:id="@+id/inputBookPdfUrl"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:hint="Link PDF (Drive,...)" />
 
-        <Button android:id="@+id/pickImageBtn"
-            android:text="Chọn ảnh bìa"
+        <EditText
+            android:id="@+id/inputBookThumbnailUrl"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:hint="Link ảnh bìa" />
+
+
+        <!--        <Button android:id="@+id/pickPdfBtn"-->
+        <!--            android:text="Chọn file PDF"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"/>-->
+
+        <!--        <Button android:id="@+id/pickImageBtn"-->
+        <!--            android:text="Chọn ảnh bìa"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"/>-->
 
         <ImageView
             android:id="@+id/previewBookThumbnail"

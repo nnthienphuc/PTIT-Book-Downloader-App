@@ -27,7 +27,9 @@
 
         <!-- Không có intent-filter cho MainActivity -->
         <activity android:name=".MainActivity" android:exported="true" />
-
+        <activity android:name=".UploadBookActivity" android:exported="false" />
+        <activity android:name=".BookDetailActivity" android:exported="false" />
+        <activity android:name=".PdfReaderActivity" android:exported="false" />
     </application>
 
 </manifest>

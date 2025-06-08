@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
-                .setAccountName(null) // Luôn hiển thị hộp chọn tài khoản
+//                .setAccountName(null)
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);

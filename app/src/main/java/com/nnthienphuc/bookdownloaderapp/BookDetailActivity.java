@@ -22,7 +22,7 @@ import java.io.File;
 public class BookDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_BOOK = "book";
-    public static final String EXTRA_MODE = "mode"; // "download" | "read" | "delete"
+    public static final String EXTRA_MODE = "mode";
 
     private TextView title, author, genre, pageCount, size, uploader, description;
     private ImageView thumbnail;

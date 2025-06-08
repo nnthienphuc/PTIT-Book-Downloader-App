@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.nnthienphuc.bookdownloaderapp.BookDetailActivity;
 import com.nnthienphuc.bookdownloaderapp.R;
 import com.nnthienphuc.bookdownloaderapp.models.Book;
@@ -20,7 +22,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
     private final Context context;
     private final List<Book> bookList;
-    private final String mode; // "download", "read", "delete"
+    private final String mode;
 
     public BookAdapter(Context context, List<Book> bookList, String mode) {
         this.context = context;
@@ -43,6 +45,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         holder.size.setText("Kích thước: " + formatSize(book.getSize()));
         holder.uploader.setText("Upload bởi: " + book.getUploader());
 
+        if (book.getThumbnailUrl() != null && !book.getThumbnailUrl().isEmpty()) {
+            Glide.with(context).load(book.getThumbnailUrl()).into(holder.thumbnail);
+        } else {
+            holder.thumbnail.setImageResource(R.drawable.ic_books);
+        }
+
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, BookDetailActivity.class);
             intent.putExtra(BookDetailActivity.EXTRA_BOOK, book);
@@ -58,6 +66,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
     static class BookViewHolder extends RecyclerView.ViewHolder {
         TextView title, author, size, uploader;
+        ImageView thumbnail;
 
         public BookViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -65,7 +74,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             author = itemView.findViewById(R.id.bookAuthor);
             size = itemView.findViewById(R.id.bookSize);
             uploader = itemView.findViewById(R.id.bookUploader);
-
+            thumbnail = itemView.findViewById(R.id.bookThumbnail);
         }
     }
 
