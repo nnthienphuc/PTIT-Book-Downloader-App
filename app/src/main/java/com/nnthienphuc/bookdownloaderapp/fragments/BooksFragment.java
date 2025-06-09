@@ -59,6 +59,12 @@ public class BooksFragment extends BaseAuthenticatedFragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadBooks();
+    }
+
     private void loadBooks() {
         db.collection("books")
                 .whereEqualTo("isDeleted", false)

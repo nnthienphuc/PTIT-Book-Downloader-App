@@ -67,11 +67,36 @@
             android:gravity="top"
             android:inputType="textMultiLine" />
 
+        <EditText
+            android:id="@+id/detailBookFileUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Link PDF"
+            android:inputType="textUri" />
+
+        <EditText
+            android:id="@+id/detailBookThumbnailUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Link ảnh bìa"
+            android:inputType="textUri" />
+
         <CheckBox
             android:id="@+id/detailBookDeleteCheckbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ẩn sách khỏi hệ thống" />
+
+        <ProgressBar
+            android:id="@+id/detailBookProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="0"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:visibility="gone"
+            android:layout_marginTop="12dp"/>
 
         <Button
             android:id="@+id/detailBookDownloadBtn"

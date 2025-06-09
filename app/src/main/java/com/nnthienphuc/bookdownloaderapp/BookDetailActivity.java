@@ -1,21 +1,13 @@
 package com.nnthienphuc.bookdownloaderapp;
 
 import android.app.Activity;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
+import android.os.*;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,24 +15,28 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.nnthienphuc.bookdownloaderapp.models.Book;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
+
+import okhttp3.*;
 
 public class BookDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_BOOK = "book";
     public static final String EXTRA_MODE = "mode";
 
-    private EditText title, author, genre, pageCount, description;
+    private EditText title, author, genre, pageCount, description, fileUrl, thumbnailUrl;
     private TextView size, uploader;
     private ImageView thumbnail;
     private Button actionBtn;
     private CheckBox deleteCheck;
+    private ProgressBar progressBar;
 
     private Book book;
     private String mode;
     private FirebaseFirestore db;
+
+    private Handler mainHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +53,11 @@ public class BookDetailActivity extends AppCompatActivity {
         thumbnail = findViewById(R.id.detailBookThumbnail);
         actionBtn = findViewById(R.id.detailBookDownloadBtn);
         deleteCheck = findViewById(R.id.detailBookDeleteCheckbox);
+        fileUrl = findViewById(R.id.detailBookFileUrl);
+        thumbnailUrl = findViewById(R.id.detailBookThumbnailUrl);
+        progressBar = findViewById(R.id.detailBookProgressBar);
 
+        mainHandler = new Handler(Looper.getMainLooper());
         book = (Book) getIntent().getSerializableExtra(EXTRA_BOOK);
         mode = getIntent().getStringExtra(EXTRA_MODE);
         db = FirebaseFirestore.getInstance();
@@ -79,8 +79,8 @@ public class BookDetailActivity extends AppCompatActivity {
         size.setText("Dung lượng: " + formatSize(book.getSize()));
         uploader.setText("Người upload: " + book.getUploader());
         description.setText(book.getDescription());
-//        deleteCheck.setChecked(book.isDeleted());
-//        deleteCheck.setVisibility(View.VISIBLE);
+        fileUrl.setText(book.getFileUrl());
+        thumbnailUrl.setText(book.getThumbnailUrl());
 
         Glide.with(this)
                 .load(convertGoogleDriveUrl(book.getThumbnailUrl()))
@@ -95,61 +95,89 @@ public class BookDetailActivity extends AppCompatActivity {
         pageCount.setEnabled(editable);
         description.setEnabled(editable);
         deleteCheck.setEnabled(editable);
+        fileUrl.setEnabled(false);
+        thumbnailUrl.setEnabled(false);
 
-//         Log.d("BookDetail", "isDeleted = " + book.isDeleted());
         deleteCheck.setChecked(book.getIsDeleted());
         deleteCheck.setVisibility(editable ? View.VISIBLE : View.GONE);
     }
 
-
     private void setupAction() {
-        switch (mode) {
-            case "download":
-                actionBtn.setText("Tải xuống");
-                actionBtn.setOnClickListener(v -> downloadBook());
-                break;
-            case "read":
-                actionBtn.setText("Đọc offline");
-                actionBtn.setOnClickListener(v -> readBook());
-                break;
-            case "delete":
-                actionBtn.setText("Lưu chỉnh sửa");
-                actionBtn.setOnClickListener(v -> editBook());
-                break;
+         if ("delete".equals(mode)) {
+            actionBtn.setText("Lưu chỉnh sửa");
+            actionBtn.setOnClickListener(v -> editBook());
+        } else if (isDownloaded()) {
+            actionBtn.setText("Đọc offline");
+            actionBtn.setOnClickListener(v -> readBook());
+            progressBar.setVisibility(View.GONE);
+        } else if (isDownloaded() || "download".equals(mode)) {
+            actionBtn.setText("Tải xuống");
+            actionBtn.setOnClickListener(v -> downloadBook());
         }
     }
 
+    private boolean isDownloaded() {
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), book.getId() + ".pdf");
+        return file.exists();
+    }
+
     private void downloadBook() {
-        if (book.getFileUrl() == null || book.getFileUrl().isEmpty()) {
-            Toast.makeText(this, "Không có đường dẫn tải sách", Toast.LENGTH_SHORT).show();
-            return;
+        try {
+            File infoFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), book.getId() + ".bookinfo");
+            FileOutputStream fos = new FileOutputStream(infoFile);
+            OutputStreamWriter writer = new OutputStreamWriter(fos);
+            writer.write(book.toJson());
+            writer.close();
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi khi lưu bookinfo", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
 
-        Uri uri = Uri.parse(convertGoogleDriveUrl(book.getFileUrl()));
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setProgress(0);
 
-        DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setTitle(book.getTitle());
-        request.setDescription("Đang tải sách...");
-        request.setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, book.getId() + ".pdf");
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setAllowedOverMetered(true);
+        new Thread(() -> {
+            OkHttpClient client = new OkHttpClient();
+            String url = convertGoogleDriveUrl(book.getFileUrl());
+            Request request = new Request.Builder().url(url).build();
 
-        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-        Toast.makeText(this, "Đã bắt đầu tải sách", Toast.LENGTH_SHORT).show();
+                File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), book.getId() + ".pdf");
+                InputStream input = response.body().byteStream();
+                long totalBytes = response.body().contentLength();
+                byte[] buffer = new byte[4096];
+                int read;
+                long downloadedBytes = 0;
+                FileOutputStream fos = new FileOutputStream(file);
+
+                while ((read = input.read(buffer)) != -1) {
+                    fos.write(buffer, 0, read);
+                    downloadedBytes += read;
+                    int progress = (int) (100 * downloadedBytes / totalBytes);
+                    mainHandler.post(() -> progressBar.setProgress(progress));
+                }
+                fos.flush();
+                fos.close();
+                input.close();
+
+                mainHandler.post(this::readBook);
+            } catch (Exception e) {
+                mainHandler.post(() -> Toast.makeText(this, "Tải thất bại", Toast.LENGTH_SHORT).show());
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void readBook() {
         File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), book.getId() + ".pdf");
         if (!file.exists()) {
-            Toast.makeText(this, "File chưa được tải", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "File chưa tải xong", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(file), "application/pdf");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        Intent intent = new Intent(this, PdfReaderActivity.class);
+        intent.putExtra(PdfReaderActivity.EXTRA_BOOK_ID, book.getId());
         startActivity(intent);
     }
 
@@ -161,6 +189,8 @@ public class BookDetailActivity extends AppCompatActivity {
         updates.put("pageCount", TextUtils.isEmpty(pageCount.getText()) ? 0 : Integer.parseInt(pageCount.getText().toString()));
         updates.put("description", description.getText().toString().trim());
         updates.put("isDeleted", deleteCheck.isChecked());
+//        updates.put("fileUrl", fileUrl.getText().toString().trim());
+//        updates.put("thumbnailUrl", thumbnailUrl.getText().toString().trim());
 
         db.collection("books").document(book.getId())
                 .update(updates)

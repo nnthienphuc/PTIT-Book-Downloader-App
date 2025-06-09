@@ -86,6 +86,10 @@ public class UploadBookActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         progressText.setVisibility(View.VISIBLE);
 
+        // ✅ convert Google Drive links về đúng dạng
+        String convertedPdfUrl = convertGoogleDriveUrl(pdfUrl);
+        String convertedImgUrl = convertGoogleDriveUrl(imageUrl);
+
         String bookId = UUID.randomUUID().toString();
 
         Book book = new Book(
@@ -98,8 +102,8 @@ public class UploadBookActivity extends AppCompatActivity {
                 user.getUid(),
                 Integer.parseInt(pageCountStr),
                 0,
-                imageUrl,
-                pdfUrl,
+                convertedImgUrl,
+                convertedPdfUrl,
                 "",
                 false
         );
@@ -112,6 +116,66 @@ public class UploadBookActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Lỗi Firestore", Toast.LENGTH_SHORT).show());
     }
+
+    private String convertGoogleDriveUrl(String originalUrl) {
+        if (originalUrl == null || !originalUrl.contains("/d/")) return originalUrl;
+        try {
+            String fileId = originalUrl.split("/d/")[1].split("/")[0];
+            return "https://drive.google.com/uc?export=download&id=" + fileId;
+        } catch (Exception e) {
+            return originalUrl;
+        }
+    }
+
+//    private void uploadBook() {
+//        String title = titleEt.getText().toString().trim();
+//        String author = authorEt.getText().toString().trim();
+//        String genre = genreEt.getText().toString().trim();
+//        String pageCountStr = pageCountEt.getText().toString().trim();
+//        String desc = descriptionEt.getText().toString().trim();
+//        String pdfUrl = pdfUrlEt.getText().toString().trim();
+//        String imageUrl = imageUrlEt.getText().toString().trim();
+//
+//        if (title.isEmpty() || author.isEmpty() || genre.isEmpty() || pageCountStr.isEmpty() || pdfUrl.isEmpty() || imageUrl.isEmpty()) {
+//            Toast.makeText(this, "Điền đủ thông tin và link", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        FirebaseUser user = auth.getCurrentUser();
+//        if (user == null) {
+//            Toast.makeText(this, "Chưa đăng nhập", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        progressBar.setVisibility(View.VISIBLE);
+//        progressText.setVisibility(View.VISIBLE);
+//
+//        String bookId = UUID.randomUUID().toString();
+//
+//        Book book = new Book(
+//                bookId,
+//                title,
+//                author,
+//                genre,
+//                desc,
+//                user.getDisplayName(),
+//                user.getUid(),
+//                Integer.parseInt(pageCountStr),
+//                0,
+//                imageUrl,
+//                pdfUrl,
+//                "",
+//                false
+//        );
+//
+//        db.collection("books").document(bookId).set(book)
+//                .addOnSuccessListener(unused -> {
+//                    saveBookInfoLocally(book);
+//                    Toast.makeText(this, "Tải sách thành công", Toast.LENGTH_SHORT).show();
+//                    finish();
+//                })
+//                .addOnFailureListener(e -> Toast.makeText(this, "Lỗi Firestore", Toast.LENGTH_SHORT).show());
+//    }
 
     private void saveBookInfoLocally(Book book) {
         try {

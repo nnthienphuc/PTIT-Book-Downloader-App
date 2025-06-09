@@ -1,11 +1,9 @@
 package com.nnthienphuc.bookdownloaderapp;
 
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import androidx.appcompat.app.AppCompatActivity;
-//import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.PDFView;
-
 
 import java.io.File;
 
@@ -19,7 +17,7 @@ public class PdfReaderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pdf_reader);
 
         String bookId = getIntent().getStringExtra(EXTRA_BOOK_ID);
-        File file = new File(getFilesDir(), bookId + ".pdf");
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), bookId + ".pdf");
 
         PDFView pdfView = findViewById(R.id.pdfView);
         if (file.exists()) {

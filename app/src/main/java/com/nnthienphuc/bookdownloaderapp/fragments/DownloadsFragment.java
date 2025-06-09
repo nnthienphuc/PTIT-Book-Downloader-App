@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +28,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadsFragment extends BaseAuthenticatedFragment {
+public class DownloadsFragment extends Fragment {
     private RecyclerView downloadsRecyclerView;
     private BookAdapter adapter;
     private final List<Book> downloadedBooks = new ArrayList<>();
@@ -57,8 +58,13 @@ public class DownloadsFragment extends BaseAuthenticatedFragment {
         });
 
         downloadsRecyclerView.setAdapter(adapter);
-        loadDownloadedBooks();
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadDownloadedBooks();
     }
 
     private void loadDownloadedBooks() {

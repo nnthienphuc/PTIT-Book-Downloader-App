@@ -17,7 +17,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,7 +60,8 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
 
         Button uploadBtn = view.findViewById(R.id.uploadBookBtn);
         uploadBtn.setOnClickListener(v -> {
-            startActivity(new Intent(getContext(), UploadBookActivity.class));
+            Intent intent = new Intent(getContext(), UploadBookActivity.class);
+            detailLauncher.launch(intent);
         });
 
         Button logoutBtn = view.findViewById(R.id.logoutBtn);
@@ -89,6 +89,7 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
             intent.putExtra(BookDetailActivity.EXTRA_MODE, "delete");
             detailLauncher.launch(intent);
         });
+
         uploadedBooksRecyclerView.setAdapter(adapter);
         loadUploadedBooks();
 
@@ -103,12 +104,8 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
                             case 2: mode = AppCompatDelegate.MODE_NIGHT_YES; break;
                             default: mode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
                         }
-
-                        SharedPreferences.Editor editor = requireActivity()
-                                .getSharedPreferences("settings", Context.MODE_PRIVATE)
-                                .edit();
+                        SharedPreferences.Editor editor = requireActivity().getSharedPreferences("settings", Context.MODE_PRIVATE).edit();
                         editor.putInt("theme_mode", mode).apply();
-
                         AppCompatDelegate.setDefaultNightMode(mode);
                     })
                     .show();
@@ -117,17 +114,10 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
         return view;
     }
 
-    private void showLogoutDialog() {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Xác nhận")
-                .setMessage("Bạn có chắc muốn đăng xuất?")
-                .setPositiveButton("Đăng xuất", (dialog, which) -> {
-                    FirebaseAuth.getInstance().signOut();
-                    startActivity(new Intent(getContext(), LoginActivity.class));
-                    requireActivity().finish();
-                })
-                .setNegativeButton("Hủy", null)
-                .show();
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadUploadedBooks();
     }
 
     private void loadUploadedBooks() {
@@ -144,5 +134,4 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
                     adapter.notifyDataSetChanged();
                 });
     }
-
 }
