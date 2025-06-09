@@ -98,6 +98,14 @@
             android:visibility="gone"
             android:layout_marginTop="12dp"/>
 
+        <TextView
+            android:id="@+id/detailBookProgressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đang tải: 0%"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/detailBookDownloadBtn"
             android:layout_width="match_parent"

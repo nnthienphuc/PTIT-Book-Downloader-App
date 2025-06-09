@@ -1,9 +1,7 @@
 package com.nnthienphuc.bookdownloaderapp;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.*;
 import android.text.TextUtils;
 import android.view.View;
@@ -26,7 +24,7 @@ public class BookDetailActivity extends AppCompatActivity {
     public static final String EXTRA_MODE = "mode";
 
     private EditText title, author, genre, pageCount, description, fileUrl, thumbnailUrl;
-    private TextView size, uploader;
+    private TextView size, uploader, progressText;
     private ImageView thumbnail;
     private Button actionBtn;
     private CheckBox deleteCheck;
@@ -56,6 +54,7 @@ public class BookDetailActivity extends AppCompatActivity {
         fileUrl = findViewById(R.id.detailBookFileUrl);
         thumbnailUrl = findViewById(R.id.detailBookThumbnailUrl);
         progressBar = findViewById(R.id.detailBookProgressBar);
+        progressText = findViewById(R.id.detailBookProgressText);
 
         mainHandler = new Handler(Looper.getMainLooper());
         book = (Book) getIntent().getSerializableExtra(EXTRA_BOOK);
@@ -110,7 +109,8 @@ public class BookDetailActivity extends AppCompatActivity {
             actionBtn.setText("Đọc offline");
             actionBtn.setOnClickListener(v -> readBook());
             progressBar.setVisibility(View.GONE);
-        } else if (isDownloaded() || "download".equals(mode)) {
+            progressText.setVisibility(View.GONE);
+        } else if ("download".equals(mode)) {
             actionBtn.setText("Tải xuống");
             actionBtn.setOnClickListener(v -> downloadBook());
         }
@@ -135,6 +135,8 @@ public class BookDetailActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
         progressBar.setProgress(0);
+        progressText.setVisibility(View.VISIBLE);
+        progressText.setText("Đang tải: 0%");
 
         new Thread(() -> {
             OkHttpClient client = new OkHttpClient();
@@ -156,7 +158,10 @@ public class BookDetailActivity extends AppCompatActivity {
                     fos.write(buffer, 0, read);
                     downloadedBytes += read;
                     int progress = (int) (100 * downloadedBytes / totalBytes);
-                    mainHandler.post(() -> progressBar.setProgress(progress));
+                    mainHandler.post(() -> {
+                        progressBar.setProgress(progress);
+                        progressText.setText("Đang tải: " + progress + "%");
+                    });
                 }
                 fos.flush();
                 fos.close();
@@ -189,8 +194,6 @@ public class BookDetailActivity extends AppCompatActivity {
         updates.put("pageCount", TextUtils.isEmpty(pageCount.getText()) ? 0 : Integer.parseInt(pageCount.getText().toString()));
         updates.put("description", description.getText().toString().trim());
         updates.put("isDeleted", deleteCheck.isChecked());
-//        updates.put("fileUrl", fileUrl.getText().toString().trim());
-//        updates.put("thumbnailUrl", thumbnailUrl.getText().toString().trim());
 
         db.collection("books").document(book.getId())
                 .update(updates)
