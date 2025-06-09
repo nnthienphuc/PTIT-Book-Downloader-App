@@ -17,44 +17,61 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_books" />
 
-        <TextView android:id="@+id/detailBookTitle"
+        <EditText
+            android:id="@+id/detailBookTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tên sách"
+            android:hint="Tên sách"
             android:textStyle="bold"
             android:textSize="20sp"
             android:paddingTop="8dp" />
 
-        <TextView android:id="@+id/detailBookAuthor"
+        <EditText
+            android:id="@+id/detailBookAuthor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tác giả" />
+            android:hint="Tác giả" />
 
-        <TextView android:id="@+id/detailBookGenre"
+        <EditText
+            android:id="@+id/detailBookGenre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Thể loại" />
+            android:hint="Thể loại" />
 
-        <TextView android:id="@+id/detailBookPageCount"
+        <EditText
+            android:id="@+id/detailBookPageCount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Số trang" />
+            android:hint="Số trang"
+            android:inputType="number" />
 
-        <TextView android:id="@+id/detailBookSize"
+        <TextView
+            android:id="@+id/detailBookSize"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Dung lượng" />
 
-        <TextView android:id="@+id/detailBookUploader"
+        <TextView
+            android:id="@+id/detailBookUploader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Người upload" />
 
-        <TextView android:id="@+id/detailBookDescription"
+        <EditText
+            android:id="@+id/detailBookDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Mô tả"
-            android:paddingTop="4dp" />
+            android:hint="Mô tả"
+            android:paddingTop="4dp"
+            android:minLines="3"
+            android:gravity="top"
+            android:inputType="textMultiLine" />
+
+        <CheckBox
+            android:id="@+id/detailBookDeleteCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ẩn sách khỏi hệ thống" />
 
         <Button
             android:id="@+id/detailBookDownloadBtn"

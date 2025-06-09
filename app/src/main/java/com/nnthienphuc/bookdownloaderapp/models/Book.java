@@ -134,7 +134,7 @@ public class Book implements Serializable {
         this.localPdfPath = localPdfPath;
     }
 
-    public boolean isDeleted() {
+    public boolean getIsDeleted() {
         return isDeleted;
     }
 
@@ -142,7 +142,6 @@ public class Book implements Serializable {
         isDeleted = deleted;
     }
 
-    // Book.java (bổ sung cuối class)
     public String toJson() {
         return new com.google.gson.Gson().toJson(this);
     }

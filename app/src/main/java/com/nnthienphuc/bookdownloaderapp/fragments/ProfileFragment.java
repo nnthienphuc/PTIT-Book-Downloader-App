@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -24,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.nnthienphuc.bookdownloaderapp.BookDetailActivity;
 import com.nnthienphuc.bookdownloaderapp.R;
 import com.nnthienphuc.bookdownloaderapp.UploadBookActivity;
 import com.nnthienphuc.bookdownloaderapp.adapters.BookAdapter;
@@ -36,9 +39,10 @@ import java.util.List;
 public class ProfileFragment extends BaseAuthenticatedFragment {
     private RecyclerView uploadedBooksRecyclerView;
     private BookAdapter adapter;
-    private List<Book> uploadedBooks = new ArrayList<>();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final List<Book> uploadedBooks = new ArrayList<>();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseUser user;
+    private ActivityResultLauncher<Intent> detailLauncher;
 
     @Nullable
     @Override
@@ -70,7 +74,21 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
 
         uploadedBooksRecyclerView = view.findViewById(R.id.uploadedBooksRecyclerView);
         uploadedBooksRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new BookAdapter(getContext(), uploadedBooks, "delete");
+
+        detailLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK) {
+                        loadUploadedBooks();
+                    }
+                });
+
+        adapter = new BookAdapter(getContext(), uploadedBooks, "delete", book -> {
+            Intent intent = new Intent(getContext(), BookDetailActivity.class);
+            intent.putExtra(BookDetailActivity.EXTRA_BOOK, book);
+            intent.putExtra(BookDetailActivity.EXTRA_MODE, "delete");
+            detailLauncher.launch(intent);
+        });
         uploadedBooksRecyclerView.setAdapter(adapter);
         loadUploadedBooks();
 
@@ -86,7 +104,6 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
                             default: mode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
                         }
 
-                        // Lưu lại theme vào SharedPreferences
                         SharedPreferences.Editor editor = requireActivity()
                                 .getSharedPreferences("settings", Context.MODE_PRIVATE)
                                 .edit();
@@ -96,7 +113,6 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
                     })
                     .show();
         });
-
 
         return view;
     }
@@ -115,16 +131,18 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
     }
 
     private void loadUploadedBooks() {
+        if (user == null) return;
         db.collection("books")
                 .whereEqualTo("uploaderUid", user.getUid())
-                .whereEqualTo("deleted", false)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     uploadedBooks.clear();
                     for (DocumentSnapshot doc : querySnapshot) {
-                        uploadedBooks.add(doc.toObject(Book.class));
+                        Book book = doc.toObject(Book.class);
+                        if (book != null) uploadedBooks.add(book);
                     }
                     adapter.notifyDataSetChanged();
                 });
     }
+
 }

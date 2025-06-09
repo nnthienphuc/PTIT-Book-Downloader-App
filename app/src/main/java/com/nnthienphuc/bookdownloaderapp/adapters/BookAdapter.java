@@ -19,15 +19,20 @@ import com.nnthienphuc.bookdownloaderapp.models.Book;
 import java.util.List;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
+    public interface OnBookClickListener {
+        void onBookClick(Book book);
+    }
 
     private final Context context;
     private final List<Book> bookList;
     private final String mode;
+    private final OnBookClickListener clickListener;
 
-    public BookAdapter(Context context, List<Book> bookList, String mode) {
+    public BookAdapter(Context context, List<Book> bookList, String mode, OnBookClickListener listener) {
         this.context = context;
         this.bookList = bookList;
         this.mode = mode;
+        this.clickListener = listener;
     }
 
     @NonNull
@@ -54,7 +59,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, BookDetailActivity.class);
             intent.putExtra(BookDetailActivity.EXTRA_BOOK, book);
-            intent.putExtra(BookDetailActivity.EXTRA_MODE, mode);
+
+            // mode truyền logic: nếu adapter mode là "delete" thì vào edit mode
+            if ("delete".equals(mode)) {
+                intent.putExtra(BookDetailActivity.EXTRA_MODE, "delete");
+            } else {
+                intent.putExtra(BookDetailActivity.EXTRA_MODE, mode);
+            }
+
             context.startActivity(intent);
         });
     }
