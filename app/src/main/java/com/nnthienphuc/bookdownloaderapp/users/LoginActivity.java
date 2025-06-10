@@ -45,13 +45,20 @@ public class LoginActivity extends AppCompatActivity {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
-//                .setAccountName(null)
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         Button loginBtn = findViewById(R.id.googleSignInBtn);
         loginBtn.setOnClickListener(v -> signIn());
+
+        Button skipBtn = findViewById(R.id.skipOfflineBtn);
+        skipBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra("start_tab", 1); // Tab 1 = Downloads
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void signIn() {

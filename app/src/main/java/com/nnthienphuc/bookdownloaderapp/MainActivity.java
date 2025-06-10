@@ -3,7 +3,6 @@ package com.nnthienphuc.bookdownloaderapp;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.viewpager2.widget.ViewPager2;
@@ -29,8 +28,19 @@ public class MainActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottomNav);
 
         viewPager.setAdapter(new MainPagerAdapter(this));
-        viewPager.setCurrentItem(0, false); // Default tab
 
+        int defaultTab = getIntent().getIntExtra("start_tab", 0);
+        viewPager.setCurrentItem(defaultTab, false);
+
+        // Bỏ listener tạm
+        bottomNav.setOnItemSelectedListener(null);
+
+        // Gán icon đúng tab
+        if (defaultTab == 0) bottomNav.setSelectedItemId(R.id.nav_all_books);
+        else if (defaultTab == 1) bottomNav.setSelectedItemId(R.id.nav_downloaded);
+        else if (defaultTab == 2) bottomNav.setSelectedItemId(R.id.nav_profile);
+
+        // Gắn lại listener sau khi sync
         bottomNav.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_all_books:
@@ -45,6 +55,21 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+
+//        bottomNav.setOnItemSelectedListener(item -> {
+//            switch (item.getItemId()) {
+//                case R.id.nav_all_books:
+//                    viewPager.setCurrentItem(0);
+//                    return true;
+//                case R.id.nav_downloaded:
+//                    viewPager.setCurrentItem(1);
+//                    return true;
+//                case R.id.nav_profile:
+//                    viewPager.setCurrentItem(2);
+//                    return true;
+//            }
+//            return false;
+//        });
 
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override

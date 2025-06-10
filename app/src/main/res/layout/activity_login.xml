@@ -19,4 +19,16 @@
         android:padding="12dp"
         android:backgroundTint="@color/purple_500"
         android:textColor="#FFFFFF" />
+
+    <Button
+        android:id="@+id/skipOfflineBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tôi không có wifi"
+        android:textAllCaps="false"
+        android:padding="12dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/white" />
+
 </LinearLayout>
