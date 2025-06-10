@@ -108,6 +108,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:paddingBottom="56dp"
+        android:clipToPadding="false"
         tools:listitem="@layout/item_book_compact"
         android:scrollbars="vertical" />
 </LinearLayout>
