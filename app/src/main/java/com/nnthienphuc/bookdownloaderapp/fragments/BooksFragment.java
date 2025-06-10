@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -26,6 +27,7 @@ import java.util.List;
 
 public class BooksFragment extends BaseAuthenticatedFragment {
     private RecyclerView booksRecyclerView;
+    private SearchView bookSearchView;
     private BookAdapter bookAdapter;
     private final List<Book> books = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -37,13 +39,14 @@ public class BooksFragment extends BaseAuthenticatedFragment {
         View view = inflater.inflate(R.layout.fragment_books, container, false);
 
         booksRecyclerView = view.findViewById(R.id.booksRecyclerView);
+        bookSearchView = view.findViewById(R.id.bookSearchView);
         booksRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         detailLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
-                        loadBooks();
+                        loadBooks(null);
                     }
                 });
 
@@ -55,26 +58,53 @@ public class BooksFragment extends BaseAuthenticatedFragment {
         });
 
         booksRecyclerView.setAdapter(bookAdapter);
-        loadBooks();
+        setupSearchListener();
+        loadBooks(null);
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadBooks();
+    private void setupSearchListener() {
+        bookSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                loadBooks(query.trim());
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.trim().isEmpty()) {
+                    loadBooks(null);
+                }
+                return false;
+            }
+        });
     }
 
-    private void loadBooks() {
+    private void loadBooks(@Nullable String keyword) {
         db.collection("books")
                 .whereEqualTo("isDeleted", false)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     books.clear();
                     for (DocumentSnapshot doc : querySnapshot) {
-                        books.add(doc.toObject(Book.class));
+                        Book book = doc.toObject(Book.class);
+                        if (book == null) continue;
+                        if (keyword == null || keyword.isEmpty()
+                                || book.getTitle().toLowerCase().contains(keyword.toLowerCase())
+                                || book.getAuthor().toLowerCase().contains(keyword.toLowerCase())
+                                || book.getGenre().toLowerCase().contains(keyword.toLowerCase())) {
+                            books.add(book);
+                        }
                     }
                     bookAdapter.notifyDataSetChanged();
                 });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String keyword = bookSearchView.getQuery().toString().trim();
+        loadBooks(keyword.isEmpty() ? null : keyword);
     }
 }

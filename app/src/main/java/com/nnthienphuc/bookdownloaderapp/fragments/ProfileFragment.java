@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -37,6 +38,7 @@ import java.util.List;
 
 public class ProfileFragment extends BaseAuthenticatedFragment {
     private RecyclerView uploadedBooksRecyclerView;
+    private SearchView bookSearchView;
     private BookAdapter adapter;
     private final List<Book> uploadedBooks = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -72,6 +74,7 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
             startActivity(i);
         });
 
+        bookSearchView = view.findViewById(R.id.bookSearchView);
         uploadedBooksRecyclerView = view.findViewById(R.id.uploadedBooksRecyclerView);
         uploadedBooksRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -79,7 +82,7 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == android.app.Activity.RESULT_OK) {
-                        loadUploadedBooks();
+                        loadUploadedBooks(null);
                     }
                 });
 
@@ -91,7 +94,8 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
         });
 
         uploadedBooksRecyclerView.setAdapter(adapter);
-        loadUploadedBooks();
+        setupSearchListener();
+        loadUploadedBooks(null);
 
         Button themeBtn = view.findViewById(R.id.changeThemeBtn);
         themeBtn.setOnClickListener(v -> {
@@ -114,13 +118,25 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadUploadedBooks();
+    private void setupSearchListener() {
+        bookSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                loadUploadedBooks(query.trim());
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.trim().isEmpty()) {
+                    loadUploadedBooks(null);
+                }
+                return false;
+            }
+        });
     }
 
-    private void loadUploadedBooks() {
+    private void loadUploadedBooks(@Nullable String keyword) {
         if (user == null) return;
         db.collection("books")
                 .whereEqualTo("uploaderUid", user.getUid())
@@ -129,9 +145,21 @@ public class ProfileFragment extends BaseAuthenticatedFragment {
                     uploadedBooks.clear();
                     for (DocumentSnapshot doc : querySnapshot) {
                         Book book = doc.toObject(Book.class);
-                        if (book != null) uploadedBooks.add(book);
+                        if (book == null) continue;
+                        if (keyword == null || keyword.isEmpty()
+                                || book.getTitle().toLowerCase().contains(keyword.toLowerCase())
+                                || book.getAuthor().toLowerCase().contains(keyword.toLowerCase())
+                                || book.getGenre().toLowerCase().contains(keyword.toLowerCase())) {
+                            uploadedBooks.add(book);
+                        }
                     }
                     adapter.notifyDataSetChanged();
                 });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadUploadedBooks(bookSearchView.getQuery().toString().trim());
     }
 }

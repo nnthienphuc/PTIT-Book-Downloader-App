@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -30,8 +31,10 @@ import java.util.List;
 
 public class DownloadsFragment extends Fragment {
     private RecyclerView downloadsRecyclerView;
+    private SearchView bookSearchView;
     private BookAdapter adapter;
     private final List<Book> downloadedBooks = new ArrayList<>();
+    private final List<Book> allBooks = new ArrayList<>();
     private ActivityResultLauncher<Intent> detailLauncher;
 
     @Nullable
@@ -40,13 +43,14 @@ public class DownloadsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_downloads, container, false);
 
         downloadsRecyclerView = view.findViewById(R.id.downloadsRecyclerView);
+        bookSearchView = view.findViewById(R.id.bookSearchView);
         downloadsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         detailLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
-                        loadDownloadedBooks();
+                        loadDownloadedBooks(null);
                     }
                 });
 
@@ -58,22 +62,44 @@ public class DownloadsFragment extends Fragment {
         });
 
         downloadsRecyclerView.setAdapter(adapter);
+        setupSearchListener();
+        loadDownloadedBooks(null);
         return view;
     }
+
+    private void setupSearchListener() {
+        bookSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                loadDownloadedBooks(query.trim());
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.trim().isEmpty()) {
+                    loadDownloadedBooks(null);
+                }
+                return false;
+            }
+        });
+    }
+
 
     @Override
     public void onResume() {
         super.onResume();
-        loadDownloadedBooks();
+        loadDownloadedBooks(bookSearchView.getQuery().toString().trim());
     }
 
-    private void loadDownloadedBooks() {
+    private void loadDownloadedBooks(@Nullable String keyword) {
         File fileDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
         File infoDir = requireContext().getFilesDir();
         if (fileDir == null || !fileDir.exists()) return;
 
         File[] pdfs = fileDir.listFiles((d, name) -> name.endsWith(".pdf"));
         downloadedBooks.clear();
+        allBooks.clear();
         Gson gson = new Gson();
 
         if (pdfs != null) {
@@ -97,9 +123,22 @@ public class DownloadsFragment extends Fragment {
                     book.setTitle(id);
                     book.setSize(file.length());
                 }
-                downloadedBooks.add(book);
+                allBooks.add(book);
             }
         }
+
+        if (keyword == null || keyword.isEmpty()) {
+            downloadedBooks.addAll(allBooks);
+        } else {
+            for (Book b : allBooks) {
+                if (b.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
+                        b.getAuthor().toLowerCase().contains(keyword.toLowerCase()) ||
+                        b.getGenre().toLowerCase().contains(keyword.toLowerCase())) {
+                    downloadedBooks.add(b);
+                }
+            }
+        }
+
         adapter.notifyDataSetChanged();
     }
 }
